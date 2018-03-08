@@ -3,6 +3,7 @@ import numpy as np
 
 import torch
 from torch.autograd import Variable
+from networks.classifiers.losses import CombinedLoss
 
 
 class Solver(object):
@@ -12,7 +13,7 @@ class Solver(object):
                          "weight_decay": 0.0001}
 
     def __init__(self, optim=torch.optim.Adam, optim_args={},
-                 loss_func=torch.nn.CrossEntropyLoss()):
+                 loss_func=CombinedLoss()):
         optim_args_merged = self.default_adam_args.copy()
         optim_args_merged.update(optim_args)
         self.optim_args = optim_args_merged
@@ -30,7 +31,7 @@ class Solver(object):
         self.val_acc_history = []
         self.val_loss_history = []
 
-    def train(self, model, train_loader, val_loader, num_epochs=10, log_nth=0):
+    def train(self, model, train_loader, val_loader, num_epochs=10, log_nth=5):
         """
         Train a given model with the provided data.
 
@@ -43,7 +44,8 @@ class Solver(object):
         """
         optim = self.optim(model.parameters(), **self.optim_args)
         self._reset_histories()
-        iter_per_epoch = len(train_loader)
+        iter_per_epoch = 10
+        # iter_per_epoch = len(train_loader)
 
         if torch.cuda.is_available():
             model.cuda()
@@ -74,30 +76,39 @@ class Solver(object):
             for i_batch, sample_batched in enumerate(train_loader):
                 X = Variable(sample_batched[0])
                 y = Variable(sample_batched[1])
+                yb = Variable(sample_batched[2])
+                w = Variable(sample_batched[3])
+
+                if model.is_cuda:
+                    X, y, yb, w = X.cuda(), y.cuda(), yb.cuda(), w.cuda()
+
+                k=1
                 for iter in range(iter_per_epoch):
-                    curr_iter += iter
-                    optim.zero_grad()
-                    output = model(X)
-                    loss = self.loss_func(output, y)
-                    loss.backward()
-                    optim.step()
-                    if iter == log_nth:
-                        self.train_loss_history.append(loss.data[0])
-                        print('[Iteration : ' + str(curr_iter) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
-                            loss.data[0]))
+                    if(k<10):
+                        k=k+1
+                        curr_iter += iter
+                        optim.zero_grad()
+                        output = model(X)
+                        loss = self.loss_func(output, y, yb, w)
+                        loss.backward()
+                        optim.step()
+                        if iter % log_nth == 0:
+                            self.train_loss_history.append(loss.data[0])
+                            print('[Iteration : ' + str(curr_iter) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
+                                loss.data[0]))
 
-                batch_output = torch.max(model(X), dim= 1)
-                test_accuracy = self.accuracy(batch_output[1], y)
-                self.train_acc_history.append(test_accuracy)
-
-                val_output = torch.max(model(Variable(torch.from_numpy(val_loader.dataset.X))), dim= 1)
-                val_accuracy = self.accuracy(val_output[1], Variable(torch.from_numpy(val_loader.dataset.y)))
-                self.val_acc_history.append(val_accuracy)
-                print('[Epoch : ' + str(epoch) + '/' + str(num_epochs) + '] : ' + str(loss.data[0]))
+                # batch_output = torch.max(model(X), dim= 1)
+                # train_accuracy = self.accuracy(batch_output[1], y)
+                # self.train_acc_history.append(train_accuracy)
+                #
+                # val_output = torch.max(model(Variable(torch.from_numpy(val_loader.dataset.X))), dim= 1)
+                # val_accuracy = self.accuracy(val_output[1], Variable(torch.from_numpy(val_loader.dataset.y)))
+                # self.val_acc_history.append(val_accuracy)
+            print('[Epoch : ' + str(epoch) + '/' + str(num_epochs) + '] : ' + str(loss.data[0]))
         ########################################################################
         #                             END OF YOUR CODE                         #
         ########################################################################
-        print('FINISH.')
+        # print('FINISH.')
 
     def accuracy(self, y_pred, y_true):
         # print(y_pred)
