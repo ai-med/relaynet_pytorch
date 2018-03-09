@@ -1,3 +1,12 @@
 # relaynet_pytorch
 
-The work is still in progress. Please do not use it now.
+PyTorch Implementation of ReLayNet with its trained models
+
+Coded by Abhijit Guha Roy and Shayan Siddiqui (https://github.com/shayansiddiqui)
+
+If you use this code for any academic purpose, please cite:
+
+A. Guha Roy, S. Conjeti, S.P.K.Karri, D.Sheet, A.Katouzian, C.Wachinger, and N.Navab, "ReLayNet: retinal layer and fluid segmentation of macular optical coherence tomography using fully convolutional networks," Biomed. Opt. Express 8, 3627-3642 (2017) 
+Link: https://arxiv.org/abs/1704.02161
+
+Enjoy!! :)
