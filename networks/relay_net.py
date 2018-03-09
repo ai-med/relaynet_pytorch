@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 
-from networks.classifiers import sub_module as sm
+from networks.net_api import sub_module as sm
 
 class ReLayNet(nn.Module):
     """

@@ -3,7 +3,7 @@ import numpy as np
 
 import torch
 from torch.autograd import Variable
-from networks.classifiers.losses import CombinedLoss
+from networks.net_api.losses import CombinedLoss
 
 
 class Solver(object):
@@ -91,7 +91,7 @@ class Solver(object):
                     optim.step()
                     if iter % log_nth == 0:
                         self.train_loss_history.append(loss.data[0])
-                        print('[Iteration : ' + str(k) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
+                        print('[Iteration : ' + str(iter) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
                             loss.data[0]))
 
                 # batch_output = torch.max(model(X), dim= 1)
