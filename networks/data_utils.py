@@ -7,21 +7,6 @@ import torch.utils.data as data
 import h5py
 
 
-# pylint: disable=C0326
-SEG_LABELS_LIST = [
-    {"id": -1, "name": "void",       "rgb_values": [0,   0,    0]},
-    {"id": 0,  "name": "building",   "rgb_values": [128, 0,    0]},
-    {"id": 1,  "name": "grass",      "rgb_values": [0,   128,  0]},
-    {"id": 2,  "name": "tree",       "rgb_values": [128, 128,  0]},
-    {"id": 3,  "name": "cow",        "rgb_values": [0,   0,    128]},
-    {"id": 4,  "name": "horse",      "rgb_values": [128, 0,    128]},
-    {"id": 5,  "name": "sheep",      "rgb_values": [0,   128,  128]},
-    {"id": 6,  "name": "sky",        "rgb_values": [128, 128,  128]},
-    {"id": 7,  "name": "mountain",   "rgb_values": [64,  0,    0]},
-    {"id": 8,  "name": "airplane",   "rgb_values": [192, 0,    0]},
-    {"id": 9,  "name": "water",      "rgb_values": [64,  128,  0]},
-    {"id": 10, "name": "face",       "rgb_values": [192, 128,  0]}]
-
 
 class ImdbData(data.Dataset):
 
