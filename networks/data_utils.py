@@ -67,8 +67,9 @@ def get_imdb_data():
     set = np.squeeze(np.asarray(set))
     sz = Data.shape
     Data = Data.reshape([sz[0], 1, sz[1], sz[2]])
-    weights = Label[:,1,:,:]
-    Label = Label[:, 0, :, :]
+    Data = Data[:,:,61:573,:]
+    weights = Label[:,1,61:573,:]
+    Label = Label[:, 0, 61:573,:]
     sz = Label.shape
     Label = Label.reshape([sz[0], 1, sz[1], sz[2]])
     weights = weights.reshape([sz[0], 1, sz[1], sz[2]])

@@ -18,7 +18,7 @@ class DiceCoeff(nn.Module):
         # print(target)
 
         self.inter = torch.dot(input, target) + 0.0001
-        self.union = torch.sum(input) + torch.sum(target) + 0.0001
+        self.union = torch.sum(input**2) + torch.sum(target**2) + 0.0001
 
         t = 2*self.inter.float()/self.union.float()
         return t
@@ -62,7 +62,7 @@ class CrossEntropyLoss2d(nn.Module):
         self.nll_loss = nn.NLLLoss2d(weight, size_average)
 
     def forward(self, inputs, targets):
-        return self.nll_loss(F.log_softmax(inputs), targets)
+        return self.nll_loss(inputs, targets)
 
 class CombinedLoss(nn.Module):
     def __init__(self):

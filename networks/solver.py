@@ -82,20 +82,17 @@ class Solver(object):
                 if model.is_cuda:
                     X, y, yb, w = X.cuda(), y.cuda(), yb.cuda(), w.cuda()
 
-                k=1
                 for iter in range(iter_per_epoch):
-                    if(k<10):
-                        k=k+1
-                        curr_iter += iter
-                        optim.zero_grad()
-                        output = model(X)
-                        loss = self.loss_func(output, y, yb, w)
-                        loss.backward()
-                        optim.step()
-                        if iter % log_nth == 0:
-                            self.train_loss_history.append(loss.data[0])
-                            print('[Iteration : ' + str(curr_iter) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
-                                loss.data[0]))
+                    curr_iter += iter
+                    optim.zero_grad()
+                    output = model(X)
+                    loss = self.loss_func(output, y, yb, w)
+                    loss.backward()
+                    optim.step()
+                    if iter % log_nth == 0:
+                        self.train_loss_history.append(loss.data[0])
+                        print('[Iteration : ' + str(k) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
+                            loss.data[0]))
 
                 # batch_output = torch.max(model(X), dim= 1)
                 # train_accuracy = self.accuracy(batch_output[1], y)

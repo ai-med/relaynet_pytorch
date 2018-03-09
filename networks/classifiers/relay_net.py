@@ -53,7 +53,9 @@ class ReLayNet(nn.Module):
         # self.params['num_channels']=64
         # print()
         e2, out2, ind2 = self.encode2.forward(e1)
+        # print(e2.shape)
         e3, out3, ind3 = self.encode3.forward(e2)
+        # print(e3.shape)
 
         bn = self.bottleneck.forward(e3)
 
