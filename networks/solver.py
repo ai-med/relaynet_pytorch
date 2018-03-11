@@ -8,13 +8,32 @@ from torch.optim import lr_scheduler
 import os
 
 
+def per_class_dice(y_pred, y_true, num_class):
+    avg_dice = 0
+    y_pred = y_pred.data.cpu().numpy()
+    y_true = y_true.data.cpu().numpy()
+    for i in range(num_class):
+        GT = y_true == (i + 1)
+        Pred = y_pred == (i + 1)
+        inter = np.sum(np.matmul(GT, Pred)) + 0.0001
+        union = np.sum(GT) + np.sum(Pred) + 0.0001
+        t = 2 * inter / union
+        avg_dice = avg_dice + (t / num_class)
+    return avg_dice
+
+
+def create_exp_directory(exp_dir_name):
+    if not os.path.exists('models/' + exp_dir_name):
+        os.makedirs('models/' + exp_dir_name)
+
+
 class Solver(object):
     # global optimiser parameters
     default_optim_args = {"lr": 1e-2,
-                         "betas": (0.9, 0.999),
-                         "eps": 1e-8,
-                         "weight_decay": 0.0001}
-    gamma= 0.5
+                          "betas": (0.9, 0.999),
+                          "eps": 1e-8,
+                          "weight_decay": 0.0001}
+    gamma = 0.5
     step_size = 5
     NumClass = 10
 
@@ -60,29 +79,9 @@ class Solver(object):
             model.cuda()
 
         print('START TRAIN.')
-        ########################################################################
-        # TODO:                                                                #
-        # Write your own personal training method for our solver. In each      #
-        # epoch iter_per_epoch shuffled training batches are processed. The    #
-        # loss for each batch is stored in self.train_loss_history. Every      #
-        # log_nth iteration the loss is logged. After one epoch the training   #
-        # accuracy of the last mini batch is logged and stored in              #
-        # self.train_acc_history. We validate at the end of each epoch, log    #
-        # the result and store the accuracy of the entire validation set in    #
-        # self.val_acc_history.                                                #
-        #                                                                      #
-        # Your logging could like something like:                              #
-        #   ...                                                                #
-        #   [Iteration 700/4800] TRAIN loss: 1.452                             #
-        #   [Iteration 800/4800] TRAIN loss: 1.409                             #
-        #   [Iteration 900/4800] TRAIN loss: 1.374                             #
-        #   [Epoch 1/5] TRAIN acc/loss: 0.560/1.374                            #
-        #   [Epoch 1/5] VAL   acc/loss: 0.539/1.310                            #
-        #   ...                                                                #
-        ########################################################################
         curr_iter = 0
 
-        self.create_exp_directory(exp_dir_name)
+        create_exp_directory(exp_dir_name)
 
         for epoch in range(num_epochs):
             scheduler.step()
@@ -107,36 +106,14 @@ class Solver(object):
                         print('[Iteration : ' + str(iter) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
                             loss.data[0]))
 
-                _,batch_output = torch.max(model(X), dim= 1)
-                avg_dice = self.per_class_dice(batch_output,y,self.NumClass)
-                print('Per class average dice score is '+str(avg_dice))
+                _, batch_output = torch.max(model(X), dim=1)
+                avg_dice = per_class_dice(batch_output, y, self.NumClass)
+                print('Per class average dice score is ' + str(avg_dice))
                 # self.train_acc_history.append(train_accuracy)
                 #
                 # val_output = torch.max(model(Variable(torch.from_numpy(val_loader.dataset.X))), dim= 1)
                 # val_accuracy = self.accuracy(val_output[1], Variable(torch.from_numpy(val_loader.dataset.y)))
                 # self.val_acc_history.append(val_accuracy)
             print('[Epoch : ' + str(epoch) + '/' + str(num_epochs) + '] : ' + str(loss.data[0]))
-            model.save('models/'+exp_dir_name+'/relaynet_epoch' + str(epoch+1) + '.model')
-        ########################################################################
-        #                             END OF YOUR CODE                         #
-        ########################################################################
-        # print('FINISH.')
-
-    def create_exp_directory(self, exp_dir_name):
-        if not os.path.exists('models/' + exp_dir_name):
-            os.makedirs('models/' + exp_dir_name)
-
-    def per_class_dice(self, y_pred, y_true, num_class):
-        avg_dice = 0
-        y_pred = y_pred.data.cpu().numpy()
-        y_true = y_true.data.cpu().numpy()
-        for i in range(num_class):
-            GT = y_true==(i+1)
-            Pred = y_pred==(i+1)
-            inter = np.sum(np.matmul(GT, Pred)) + 0.0001
-            union = np.sum(GT) + np.sum(Pred) + 0.0001
-            t = 2 * inter / union
-            avg_dice = avg_dice + (t/num_class)
-        return avg_dice
-
-
+            model.save('models/' + exp_dir_name + '/relaynet_epoch' + str(epoch + 1) + '.model')
+        print('FINISH.')

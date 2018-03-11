@@ -4,6 +4,7 @@ import torch.nn as nn
 
 from networks.net_api import sub_module as sm
 
+
 class ReLayNet(nn.Module):
     """
     A PyTorch implementation of ReLayNet
@@ -24,7 +25,6 @@ class ReLayNet(nn.Module):
     """
 
     def __init__(self, params):
-
         super(ReLayNet, self).__init__()
 
         self.encode1 = sm.EncoderBlock(params)
@@ -40,32 +40,18 @@ class ReLayNet(nn.Module):
         params['num_channels'] = 64
         self.classifier = sm.ClassifierBlock(params)
 
-        ############################################################################
-        #                             END OF YOUR CODE                             #
-        ############################################################################
-
     def forward(self, input):
         e1, out1, ind1 = self.encode1.forward(input)
-        # print(e1.shape)
-        # print(out1.shape)
-        # print(ind1.shape)
-        # print(input.shape)
-        # self.params['num_channels']=64
-        # print()
         e2, out2, ind2 = self.encode2.forward(e1)
-        # print(e2.shape)
         e3, out3, ind3 = self.encode3.forward(e2)
-        # print(e3.shape)
-
         bn = self.bottleneck.forward(e3)
 
-        d3 = self.decode1.forward(bn,out3,ind3)
-        d2 = self.decode2.forward(d3,out2,ind2)
-        d1 = self.decode3.forward(d2,out1,ind1)
+        d3 = self.decode1.forward(bn, out3, ind3)
+        d2 = self.decode2.forward(d3, out2, ind2)
+        d1 = self.decode3.forward(d2, out1, ind1)
         prob = self.classifier.forward(d1)
 
         return prob
-
 
     @property
     def is_cuda(self):

@@ -7,9 +7,7 @@ import torch.utils.data as data
 import h5py
 
 
-
 class ImdbData(data.Dataset):
-
     def __init__(self, X, y, yb, w):
         self.X = X
         self.y = y
@@ -20,7 +18,7 @@ class ImdbData(data.Dataset):
         img = self.X[index]
         label = self.y[index]
         label_bin = self.yb[index]
-        weight =  self.w[index]
+        weight = self.w[index]
 
         img = torch.from_numpy(img)
         label = torch.from_numpy(label)
@@ -30,7 +28,6 @@ class ImdbData(data.Dataset):
 
     def __len__(self):
         return len(self.y)
-
 
 
 def get_imdb_data():
@@ -52,9 +49,9 @@ def get_imdb_data():
     set = np.squeeze(np.asarray(set))
     sz = Data.shape
     Data = Data.reshape([sz[0], 1, sz[1], sz[2]])
-    Data = Data[:,:,61:573,:]
-    weights = Label[:,1,61:573,:]
-    Label = Label[:, 0, 61:573,:]
+    Data = Data[:, :, 61:573, :]
+    weights = Label[:, 1, 61:573, :]
+    Label = Label[:, 0, 61:573, :]
     sz = Label.shape
     Label = Label.reshape([sz[0], 1, sz[1], sz[2]])
     weights = weights.reshape([sz[0], 1, sz[1], sz[2]])
@@ -62,9 +59,9 @@ def get_imdb_data():
     test_id = set == 3
 
     Tr_Dat = Data[train_id, :, :, :]
-    Tr_Label = np.squeeze(Label[train_id,:,:,:])
-    Tr_weights = weights[train_id,:,:,:]
-    Tr_weights = np.tile(Tr_weights,[1, NumClass, 1, 1])
+    Tr_Label = np.squeeze(Label[train_id, :, :, :])
+    Tr_weights = weights[train_id, :, :, :]
+    Tr_weights = np.tile(Tr_weights, [1, NumClass, 1, 1])
 
     Te_Dat = Data[test_id, :, :, :]
     Te_Label = np.squeeze(Label[test_id, :, :, :])
@@ -76,15 +73,11 @@ def get_imdb_data():
     y2 = np.ones((sz[0], NumClass, sz[2], sz[3]))
     y_test = np.ones((sz_test[0], NumClass, sz_test[2], sz_test[3]))
     for i in range(NumClass):
-        y2[:, i, :, :] = np.squeeze(np.multiply(np.ones(Tr_Label.shape),((Tr_Label == i))))
+        y2[:, i, :, :] = np.squeeze(np.multiply(np.ones(Tr_Label.shape), ((Tr_Label == i))))
         y_test[:, i, :, :] = np.squeeze(np.multiply(np.ones(Te_Label.shape), ((Te_Label == i))))
 
     Tr_Label_bin = y2
     Te_Label_bin = y_test
 
-
     return (ImdbData(Tr_Dat, Tr_Label, Tr_Label_bin, Tr_weights),
             ImdbData(Te_Dat, Te_Label, Te_Label_bin, Te_weights))
-
-
-
