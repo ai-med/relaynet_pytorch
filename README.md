@@ -1,6 +1,6 @@
 # relaynet_pytorch
 
-PyTorch Implementation of ReLayNet with its trained models
+PyTorch Implementation of ReLayNet. There are still some bugs and issues in the code, we are working on fixing them.
 
 Coded by Abhijit Guha Roy and Shayan Siddiqui (https://github.com/shayansiddiqui)
 
