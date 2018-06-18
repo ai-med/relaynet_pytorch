@@ -8,23 +8,20 @@ import h5py
 
 
 class ImdbData(data.Dataset):
-    def __init__(self, X, y, yb, w):
+    def __init__(self, X, y, w):
         self.X = X
         self.y = y
-        self.yb = yb
         self.w = w
 
     def __getitem__(self, index):
         img = self.X[index]
         label = self.y[index]
-        label_bin = self.yb[index]
         weight = self.w[index]
 
         img = torch.from_numpy(img)
         label = torch.from_numpy(label)
-        label_bin = torch.from_numpy(label_bin)
         weight = torch.from_numpy(weight)
-        return img, label, label_bin, weight
+        return img, label, weight
 
     def __len__(self):
         return len(self.y)
@@ -32,7 +29,7 @@ class ImdbData(data.Dataset):
 
 def get_imdb_data():
     # TODO: Need to change later
-    NumClass = 10
+    NumClass = 9
 
     # Load DATA
     Data = h5py.File('datasets/Data.h5', 'r')
@@ -59,25 +56,16 @@ def get_imdb_data():
     test_id = set == 3
 
     Tr_Dat = Data[train_id, :, :, :]
-    Tr_Label = np.squeeze(Label[train_id, :, :, :])
+    Tr_Label = np.squeeze(Label[train_id, :, :, :]) - 1 # Index from [0-(NumClass-1)]
     Tr_weights = weights[train_id, :, :, :]
     Tr_weights = np.tile(Tr_weights, [1, NumClass, 1, 1])
 
     Te_Dat = Data[test_id, :, :, :]
-    Te_Label = np.squeeze(Label[test_id, :, :, :])
+    Te_Label = np.squeeze(Label[test_id, :, :, :]) - 1
     Te_weights = weights[test_id, :, :, :]
     Te_weights = np.tile(Te_weights, [1, NumClass, 1, 1])
 
-    sz = Tr_Dat.shape
-    sz_test = Te_Dat.shape
-    y2 = np.ones((sz[0], NumClass, sz[2], sz[3]))
-    y_test = np.ones((sz_test[0], NumClass, sz_test[2], sz_test[3]))
-    for i in range(NumClass):
-        y2[:, i, :, :] = np.squeeze(np.multiply(np.ones(Tr_Label.shape), ((Tr_Label == i))))
-        y_test[:, i, :, :] = np.squeeze(np.multiply(np.ones(Te_Label.shape), ((Te_Label == i))))
 
-    Tr_Label_bin = y2
-    Te_Label_bin = y_test
 
-    return (ImdbData(Tr_Dat, Tr_Label, Tr_Label_bin, Tr_weights),
-            ImdbData(Te_Dat, Te_Label, Te_Label_bin, Te_weights))
+    return (ImdbData(Tr_Dat, Tr_Label, Tr_weights),
+            ImdbData(Te_Dat, Te_Label, Te_weights))

@@ -1,6 +1,6 @@
 from random import shuffle
 import numpy as np
-
+import torch.nn.functional as F
 import torch
 from torch.autograd import Variable
 from networks.net_api.losses import CombinedLoss
@@ -35,7 +35,7 @@ class Solver(object):
                           "weight_decay": 0.0001}
     gamma = 0.5
     step_size = 5
-    NumClass = 10
+    NumClass = 9
 
     def __init__(self, optim=torch.optim.Adam, optim_args={},
                  loss_func=CombinedLoss()):
@@ -72,7 +72,7 @@ class Solver(object):
                                         gamma=self.gamma)  # decay LR by a factor of 0.5 every 5 epochs
 
         self._reset_histories()
-        iter_per_epoch = 10
+        iter_per_epoch = 1
         # iter_per_epoch = len(train_loader)
 
         if torch.cuda.is_available():
@@ -88,17 +88,16 @@ class Solver(object):
             for i_batch, sample_batched in enumerate(train_loader):
                 X = Variable(sample_batched[0])
                 y = Variable(sample_batched[1])
-                yb = Variable(sample_batched[2])
-                w = Variable(sample_batched[3])
+                w = Variable(sample_batched[2])
 
                 if model.is_cuda:
-                    X, y, yb, w = X.cuda(), y.cuda(), yb.cuda(), w.cuda()
+                    X, y, w = X.cuda(), y.cuda(), w.cuda()
 
                 for iter in range(iter_per_epoch):
                     curr_iter += iter
                     optim.zero_grad()
                     output = model(X)
-                    loss = self.loss_func(output, y, yb, w)
+                    loss = self.loss_func(output, y, w)
                     loss.backward()
                     optim.step()
                     if iter % log_nth == 0:
@@ -106,9 +105,10 @@ class Solver(object):
                         print('[Iteration : ' + str(iter) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
                             loss.data[0]))
 
-                _, batch_output = torch.max(model(X), dim=1)
-                avg_dice = per_class_dice(batch_output, y, self.NumClass)
-                print('Per class average dice score is ' + str(avg_dice))
+
+                #_, batch_output = torch.max(F.softmax(model(X),dim=1), dim=1)
+                #avg_dice = per_class_dice(batch_output, y, self.NumClass)
+                #print('Per class average dice score is ' + str(avg_dice))
                 # self.train_acc_history.append(train_accuracy)
                 #
                 # val_output = torch.max(model(Variable(torch.from_numpy(val_loader.dataset.X))), dim= 1)

@@ -70,5 +70,5 @@ class ClassifierBlock(nn.Module):
 
     def forward(self, input):
         out_conv = self.conv(input)
-        out_logit = self.softmax(out_conv)
-        return out_logit
+        #out_logit = self.softmax(out_conv)
+        return out_conv
