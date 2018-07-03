@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: relaynet-pytorch
+Version: 1.1
+Summary: Retinal Layer and Fluid Segmentation of Macular Optical Coherence Tomography using Fully Convolutional Networks.
+Home-page: https://github.com/abhi4ssj/relaynet_pytorch
+Author: Abhijit Guha Roy
+Author-email: abhi4ssj@gmail.com
+License: UNKNOWN
+Description-Content-Type: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN

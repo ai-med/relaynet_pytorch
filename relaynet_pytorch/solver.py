@@ -3,7 +3,7 @@ import numpy as np
 import torch.nn.functional as F
 import torch
 from torch.autograd import Variable
-from networks.net_api.losses import CombinedLoss
+from relaynet_pytorch.net_api.losses import CombinedLoss
 from torch.optim import lr_scheduler
 import os
 

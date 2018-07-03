@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 
-from networks.net_api import sub_module as sm
+from relaynet_pytorch.net_api import sub_module as sm
 
 
 class ReLayNet(nn.Module):
