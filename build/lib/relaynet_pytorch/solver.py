@@ -102,8 +102,8 @@ class Solver(object):
                     optim.step()
                     if iter % log_nth == 0:
                         self.train_loss_history.append(loss.data[0])
-                        print('[Iteration : ' + str(iter) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
-                            loss.data[0]))
+                        #print('[Iteration : ' + str(iter) + '/' + str(iter_per_epoch * num_epochs) + '] : ' + str(
+                        #    loss.data[0]))
 
 
                 #_, batch_output = torch.max(F.softmax(model(X),dim=1), dim=1)
